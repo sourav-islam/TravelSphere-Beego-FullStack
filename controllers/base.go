@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"TravelSphere/utils"
-
 	"github.com/beego/beego/v2/server/web"
 )
 
@@ -10,7 +8,8 @@ type BaseController struct {
 	web.Controller
 }
 
-func (c *BaseController) ServeJSONResponse(resp utils.JSONResponse) {
-	c.Data["json"] = resp
-	c.ServeJSON()
+func (c *BaseController) Prepare() {
+	// Provide safe defaults for templates so comparisons do not fail on nil values.
+	c.Data["ActiveMenu"] = ""
+	c.Data["IsLoggedIn"] = false
 }
