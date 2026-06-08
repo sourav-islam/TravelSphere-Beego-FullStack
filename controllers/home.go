@@ -10,3 +10,17 @@ func (c *HomeController) Get() {
 	c.TplName = "home.tpl"
 	c.Data["ActiveMenu"] = "home"
 }
+
+func (c *HomeController) Login() {
+	username := c.GetString("username")
+	if username == "" {
+		username = "guest"
+	}
+	c.SetSession("username", username)
+	c.Redirect("/", 302)
+}
+
+func (c *HomeController) Logout() {
+	c.DestroySession()
+	c.Redirect("/", 302)
+}
