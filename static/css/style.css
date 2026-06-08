@@ -153,3 +153,93 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 
 /* Loading spinner */
 .loading { text-align: center; padding: 40px; color: var(--text-muted); }
+
+/* ── Country Explorer (4-col grid matching screenshot) ── */
+.country-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 1024px) { .country-grid-4 { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 720px)  { .country-grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px)  { .country-grid-4 { grid-template-columns: 1fr; } }
+
+.ccard {
+  display: block;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  color: var(--text);
+  text-decoration: none;
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.ccard:hover {
+  box-shadow: 0 6px 24px rgba(108,63,197,0.13);
+  transform: translateY(-2px);
+}
+
+.ccard-flag {
+  width: 100%;
+  height: 155px;
+  overflow: hidden;
+  background: var(--bg);
+}
+.ccard-flag img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ccard-body {
+  padding: 12px 14px 14px;
+}
+
+.ccard-name {
+  font-size: 1rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.ccard-row {
+  font-size: 0.78rem;
+  color: #444;
+  margin-bottom: 3px;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ccard-lbl {
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* filter bar — side by side */
+.filter-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 16px;
+  background: var(--card-bg);
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.filter-group:first-child input {
+  min-width: 160px;
+}
+.filter-group select {
+  min-width: 160px;
+}
