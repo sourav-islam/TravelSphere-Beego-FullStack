@@ -17,7 +17,7 @@ func InitAPIRoutes() {
 	web.Router("/api/wishlist/:id", &apicontrollers.WishlistAPIController{}, "put:Update;delete:Delete")
 
 	// // Dashboard API
-	// web.Router("/api/dashboard/summary", &apicontrollers.DashboardAPIController{}, "get:Summary")
+	web.Router("/api/dashboard/summary", &apicontrollers.DashboardAPIController{}, "get:Summary")
 
 	fmt.Println("API routes initialized")
 }
