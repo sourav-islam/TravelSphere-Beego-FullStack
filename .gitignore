@@ -3,3 +3,4 @@ conf/app.conf
 *.test
 /bin/
 vendor/
+TravelSphere

@@ -32,7 +32,7 @@ func InitSSRRoutes() {
 	web.Router("/countries", &controllers.CountryController{}, "get:List")
 	web.Router("/countries/:slug", &controllers.CountryController{}, "get:Detail")
 	web.Router("/wishlist", &controllers.WishlistController{}, "get:Get")
-	// web.Router("/dashboard", &controllers.DashboardController{}, "get:Get")
+	web.Router("/dashboard", &controllers.DashboardController{}, "get:Get")
 	fmt.Println("SSR routes initialized")
 }
 
