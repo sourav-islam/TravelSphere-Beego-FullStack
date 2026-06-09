@@ -2,7 +2,10 @@ module TravelSphere
 
 go 1.26.2
 
-require github.com/beego/beego/v2 v2.3.10
+require (
+	github.com/beego/beego/v2 v2.3.10
+	github.com/google/uuid v1.6.0
+)
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
