@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"TravelSphere/models"
 	"TravelSphere/services"
 	"log"
 )
@@ -23,6 +24,7 @@ func (c *CountryController) List() {
 		countries = nil
 	}
 	c.Data["Countries"] = countries
+	c.Layout = "layout/main.tpl"
 	c.TplName = "countries.tpl"
 }
 
@@ -38,12 +40,13 @@ func (c *CountryController) Detail() {
 		return
 	}
 
-	var attractions interface{}
-	lat, lon, found := services.GetCapitalCoords(country.Capital)
-	if found {
-		attrs, aErr := services.GetAttractionsByCountry(lat, lon)
+	// Use capital name directly — no lat/lon lookup needed
+	var attractions []models.AttractionDTO
+	if country.Capital != "" && country.Capital != "N/A" {
+		attrs, aErr := services.GetAttractionsByCapital(country.Capital)
 		if aErr != nil {
-			log.Printf("Attractions error for %s: %v", country.Name, aErr)
+			log.Printf("Attractions error for %s (%s): %v", country.Name, country.Capital, aErr)
+			// Non-fatal — page still renders, attractions section shows fallback
 		} else {
 			attractions = attrs
 		}
@@ -51,5 +54,6 @@ func (c *CountryController) Detail() {
 
 	c.Data["Country"] = country
 	c.Data["Attractions"] = attractions
+	c.Layout = "layout/main.tpl"
 	c.TplName = "destination.tpl"
 }

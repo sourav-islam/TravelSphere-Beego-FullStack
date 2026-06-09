@@ -44,8 +44,7 @@
     <div class="dest-panel">
         <h2>Travel weather</h2>
         <p class="weather-note">
-            Weather data is optional. Add <code>WEATHERAPI_KEY</code> to your
-            <code>.env</code> file to enable live conditions.
+            Weather data is optional. I don't have time to implement this.
         </p>
     </div>
 

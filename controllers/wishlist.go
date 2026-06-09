@@ -21,5 +21,6 @@ func (c *WishlistController) Get() {
 	userID := c.GetUserID()
 	items := services.GetWishlist(userID)
 	c.Data["WishlistItems"] = items
+	c.Layout = "layout/main.tpl"
 	c.TplName = "wishlist.tpl"
 }
