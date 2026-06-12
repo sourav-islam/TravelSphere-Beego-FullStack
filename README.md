@@ -19,23 +19,23 @@ TravelSphere allows users to:
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Backend framework | Beego v2 (Go) |
-| Templating | Beego SSR templates (.tpl) |
-| Routing | Beego router (SSR + JSON API) |
-| Session management | Beego in-memory session |
-| Country data | REST Countries API v3.1 |
-| Attractions data | OpenTripMap API |
-| Wishlist storage | In-memory store (no database) |
-| Frontend | Vanilla JavaScript (Fetch API) |
-| Styling | Plain CSS with CSS variables |
-| Configuration | `conf/app.conf` |
-
+| Layer              | Technology                     |
+| ------------------ | ------------------------------ |
+| Backend framework  | Beego v2 (Go)                  |
+| Templating         | Beego SSR templates (.tpl)     |
+| Routing            | Beego router (SSR + JSON API)  |
+| Session management | Beego in-memory session        |
+| Country data       | REST Countries API v5          |
+| Attractions data   | OpenTripMap API                |
+| Wishlist storage   | In-memory store (no database)  |
+| Frontend           | Vanilla JavaScript (Fetch API) |
+| Styling            | Plain CSS with CSS variables   |
+| Configuration      | `conf/app.conf`                |
 
 ---
 
 ## Project Structure
+
 ```
 TravelSphere/
 ├── conf/
@@ -89,6 +89,7 @@ TravelSphere/
 ├── go.sum
 
 ```
+
 ---
 
 ## Setup Instructions
@@ -102,7 +103,7 @@ TravelSphere/
 ### 2. Clone the repository
 
 ```bash
-git clone https://github.com/sourav-islam/TravelSphere-Beego-FullStack
+git clone https://github.com/sourav-islam/TravelSphere-Beego-FullStack.git
 cd TravelSphere
 ```
 
@@ -113,10 +114,11 @@ go mod tidy
 ```
 
 ## ⚙️ Quick Configuration (`conf/app.conf`)
+
 Beego reads this automatically. No `.env` needed.
 
-```ini
-appname = TravelSphere
+````ini
+appname = TravelSphere-Beego-FullStack
 httpport = 8081
 runmode = dev
 
@@ -124,7 +126,8 @@ sessionon = true
 sessionprovider = memory
 copyrequestbody = true
 
-restcountries_api_BASE_URL = https://restcountries.com/v3.1/all
+RESTCOUNTRIES_API_KEY = your_restcountries_key_here
+RESTCOUNTRIES_API_BASE_URL = https://api.restcountries.com/countries/v5
 OPENTRIPMAP_BASE_URL = https://api.opentripmap.com/0.1/en/places/radius
 opentripmap_api_key = your_key_here
 
@@ -132,18 +135,20 @@ opentripmap_api_key = your_key_here
 
 ```bash
 go run main.go
-```
+````
 
 ### 6. Open in browser
+
 http://localhost:8081
 
 ---
+
 ### Why in-memory
 
 - No database setup required for the assessment
 - Zero external dependencies
 - Thread-safe with `sync.RWMutex`
-- Fits the assessment requirement: *"wishlist data accessed through service-layer API calls"*
+- Fits the assessment requirement: _"wishlist data accessed through service-layer API calls"_
 
 ### Limitation
 
@@ -169,26 +174,28 @@ type WishlistItem struct {
 
 All AJAX interactions update **only the targeted container** — the browser never reloads the full page.
 
-| Page | Trigger | Container updated | API called |
-|---|---|---|---|
-| `/` | Typing in search box | `#search-suggestions` | `GET /search?q=` |
-| `/countries` | Search input / region filter | `#country-results` | `GET /api/countries` |
-| `/countries/:slug` | Click "Add to Wishlist" | `#wishlist-feedback` | `POST /api/wishlist` |
-| `/wishlist` | Click Save on a row | Row in `#wishlist-rows` | `PUT /api/wishlist/:id` |
-| `/wishlist` | Click Delete on a row | Row removed from DOM | `DELETE /api/wishlist/:id` |
-| `/dashboard` | Auto every 30 seconds | `#dashboard-stats` | `GET /api/dashboard/summary` |
+| Page               | Trigger                      | Container updated       | API called                   |
+| ------------------ | ---------------------------- | ----------------------- | ---------------------------- |
+| `/`                | Typing in search box         | `#search-suggestions`   | `GET /search?q=`             |
+| `/countries`       | Search input / region filter | `#country-results`      | `GET /api/countries`         |
+| `/countries/:slug` | Click "Add to Wishlist"      | `#wishlist-feedback`    | `POST /api/wishlist`         |
+| `/wishlist`        | Click Save on a row          | Row in `#wishlist-rows` | `PUT /api/wishlist/:id`      |
+| `/wishlist`        | Click Delete on a row        | Row removed from DOM    | `DELETE /api/wishlist/:id`   |
+| `/dashboard`       | Auto every 30 seconds        | `#dashboard-stats`      | `GET /api/dashboard/summary` |
 
 ---
 
 ## External APIs
 
 ### REST Countries API
-- **URL:** `https://restcountries.com/v3.1/all`
+
+- **URL:** `https://api.restcountries.com/countries/v5`
 - **Used for:** country name, flag, capital, population, region, languages, currencies
 - **Auth:** None required
 - **Caching:** Results cached in memory on first load — subsequent requests served from cache
 
 ### OpenTripMap API
+
 - **URL:** `https://api.opentripmap.com/0.1/en/places/`
 - **Used for:** geocoding capital cities, fetching nearby attractions
 - **Auth:** API key in `conf/app.conf` → `opentripmap_api_key`
@@ -197,7 +204,6 @@ All AJAX interactions update **only the targeted container** — the browser nev
   2. `radius` endpoint fetches attractions within 50km
 
 ---
-
 
 ## Architecture Notes
 
@@ -218,6 +224,7 @@ Two filters registered in `routers/router.go`:
 ### Prepare() usage
 
 `BaseController.Prepare()` runs before every SSR controller action and:
+
 - Sets `c.Layout = "layout/main.tpl"`
 - Reads session username → sets `c.IsLoggedIn`, `c.CurrentUser`
 - Passes `CurrentUser`, `IsLoggedIn`, `ActiveMenu` to all templates
@@ -225,9 +232,9 @@ Two filters registered in `routers/router.go`:
 ### Country slug resolution
 
 Country names from REST Countries API are converted to slugs at cache-load time:
+
 - Lowercased
 - Spaces replaced with hyphens
 - Apostrophes and commas removed
 
 The same function runs on every search, ensuring consistent matching.
-
