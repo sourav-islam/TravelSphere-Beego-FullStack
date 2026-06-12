@@ -1,4 +1,4 @@
-appname = TravelSphere
+appname = TravelSphere-Beego-FullStack
 httpport = 8081
 runmode = dev
 sessionon = true
@@ -7,6 +7,7 @@ sessiongcmaxlifetime = 3600
 copyrequestbody = true
 
 # Custom Third-Party Keys (can be read via web.AppConfig)
-restcountries_api_BASE_URL = https://restcountries.com/v3.1/all
+RESTCOUNTRIES_API_KEY = your_restcountries_key_here
+RESTCOUNTRIES_API_BASE_URL = https://api.restcountries.com/countries/v5
 OPENTRIPMAP_BASE_URL = https://api.opentripmap.com/0.1/en/places/radius
 OPENTRIPMAP_API_KEY=your_opentripmap_key_here

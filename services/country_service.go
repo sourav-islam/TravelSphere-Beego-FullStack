@@ -24,19 +24,27 @@ func GetAllCountries() ([]models.CountryDTO, error) {
 	}
 	countryCacheLock.RUnlock()
 
-	var raw []models.Country
-	baseURL := web.AppConfig.DefaultString("restcountries_api_BASE_URL", "https://restcountries.com/v3.1/all")
-	url := fmt.Sprintf("%s?fields=name,capital,population,region,subregion,flags,languages,currencies,cca2,cca3", baseURL)
-	err := utils.GetJSON(url, &raw)
+	// Read API configuration
+	baseURL := web.AppConfig.DefaultString("RESTCOUNTRIES_API_BASE_URL", "https://api.restcountries.com/countries/v5")
+	apiKey := web.AppConfig.DefaultString("RESTCOUNTRIES_API_KEY", "")
+
+	// Build URL with v5 query parameters
+	url := fmt.Sprintf("%s?limit=100&response_fields=names.common,capitals,population,region,subregion,flag.url_png,flag.description,languages,currencies,codes.alpha_2,codes.alpha_3", baseURL)
+
+	// Fetch data with API key authentication
+	var apiResponse models.APIResponse
+	err := utils.GetJSONWithAuth(url, apiKey, &apiResponse)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch countries: %w", err)
 	}
 
+	// Transform raw API response to DTOs
 	var dtos []models.CountryDTO
-	for _, c := range raw {
+	for _, c := range apiResponse.Data.Objects {
 		dtos = append(dtos, transformCountry(c))
 	}
 
+	// Cache the results
 	countryCacheLock.Lock()
 	countryCache = dtos
 	cacheLoaded = true
@@ -102,15 +110,17 @@ func GetFeaturedCountries() ([]models.CountryDTO, error) {
 }
 
 func transformCountry(c models.Country) models.CountryDTO {
+	// Extract capital name from capitals array
 	capital := "N/A"
-	if len(c.Capital) > 0 {
-		capital = c.Capital[0]
+	if len(c.Capitals) > 0 {
+		capital = c.Capitals[0].Name
 	}
 
+	// Format currencies from array
 	var currencyParts []string
-	for code, cur := range c.Currencies {
+	for _, cur := range c.Currencies {
 		if cur.Name != "" {
-			currencyParts = append(currencyParts, fmt.Sprintf("%s (%s)", cur.Name, code))
+			currencyParts = append(currencyParts, fmt.Sprintf("%s (%s)", cur.Name, cur.Code))
 		}
 	}
 	currencies := strings.Join(currencyParts, ", ")
@@ -118,17 +128,29 @@ func transformCountry(c models.Country) models.CountryDTO {
 		currencies = "N/A"
 	}
 
+	// Format languages from array
+	var languageParts []string
+	for _, lang := range c.Languages {
+		if lang.Name != "" {
+			languageParts = append(languageParts, lang.Name)
+		}
+	}
+	languages := strings.Join(languageParts, ", ")
+	if languages == "" {
+		languages = "N/A"
+	}
+
 	return models.CountryDTO{
-		Slug:       utils.CountryNameToSlug(c.Name.Common),
-		Name:       c.Name.Common,
+		Slug:       utils.CountryNameToSlug(c.Names.Common),
+		Name:       c.Names.Common,
 		Capital:    capital,
 		Population: utils.FormatPopulation(c.Population),
 		Region:     c.Region,
 		Subregion:  c.Subregion,
-		FlagURL:    c.Flags.Png,
-		FlagAlt:    c.Flags.Alt,
-		Languages:  utils.FormatLanguages(c.Languages),
+		FlagURL:    c.Flag.URLPng,
+		FlagAlt:    c.Flag.Description,
+		Languages:  languages,
 		Currencies: currencies,
-		Cca2:       c.Cca2,
+		Cca2:       c.Codes.Alpha2,
 	}
 }
